@@ -2,42 +2,118 @@
 <html>
 <head>
 <meta charset="utf-8">
-<title>ColdChain Rx Monitor</title>
+<title>ColdChain</title>
 <style>
-  #root { font-family: Arial, Helvetica, sans-serif; padding: 16px; color: #1a1a1a; }
-  .cc-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; flex-wrap: wrap; gap: 8px; }
-  .cc-header h1 { font-size: 18px; margin: 0; }
-  .cc-range { font-size: 13px; }
-  .cc-range input { width: 50px; margin: 0 4px; }
-  .cc-banner { background: #fff8e1; border: 1px solid #ffd54f; padding: 8px 12px; border-radius: 4px; margin-bottom: 12px; font-size: 13px; }
-  .cc-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: 12px; margin-bottom: 24px; }
-  .cc-card { border-radius: 6px; padding: 12px; border: 1px solid #ddd; }
-  .cc-card.cc-safe { border-color: #4caf50; background: #f1f8f1; }
-  .cc-card.cc-alert { border-color: #e53935; background: #fdecea; }
-  .cc-card.cc-unknown { border-color: #bbb; background: #f5f5f5; }
-  .cc-card-name { font-weight: bold; margin-bottom: 4px; font-size: 13px; }
-  .cc-card-temp { font-size: 22px; margin-bottom: 4px; }
-  .cc-card-status { font-size: 11px; text-transform: uppercase; margin-bottom: 6px; color: #555; }
-  .cc-card-source { font-size: 11px; color: #888; }
-  .cc-card svg { display: block; margin-top: 4px; color: #777; }
-  h2 { font-size: 15px; margin: 0 0 8px; }
-  table#ccLog { width: 100%; border-collapse: collapse; font-size: 12px; }
-  table#ccLog th, table#ccLog td { border-bottom: 1px solid #ddd; padding: 6px 8px; text-align: left; }
+  * { box-sizing: border-box; }
+  body { margin: 0; }
+  #root { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif; background: #f4f6f8; padding: 24px; color: #1d2126; }
+
+  .cc-topbar { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 20px; flex-wrap: wrap; gap: 12px; }
+  .cc-title h1 { font-size: 26px; margin: 0 0 4px; font-weight: 700; }
+  .cc-updated { font-size: 13px; color: #8a93a1; }
+  .cc-controls { display: flex; gap: 10px; align-items: center; }
+  .cc-controls input[type="text"] { padding: 9px 12px; border: 1px solid #d7dbe2; border-radius: 6px; font-size: 13px; width: 200px; background: #fff; }
+  .cc-controls button { padding: 9px 16px; border: none; border-radius: 6px; background: #2f6fed; color: #fff; font-size: 13px; font-weight: 600; cursor: pointer; }
+  .cc-controls button:hover { background: #2459c4; }
+
+  .cc-banner { background: #fff8e1; border: 1px solid #ffd54f; padding: 10px 14px; border-radius: 6px; margin-bottom: 16px; font-size: 13px; }
+
+  .cc-action-panel { margin-bottom: 20px; }
+  .cc-action-title { font-size: 14px; font-weight: 700; color: #d23c3c; margin-bottom: 10px; text-transform: uppercase; letter-spacing: .03em; }
+  .cc-action-item { background: #fdecea; border: 1px solid #f5c2c0; border-left: 4px solid #d23c3c; border-radius: 6px; padding: 12px 16px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; }
+  .cc-action-info strong { display: block; font-size: 14px; margin-bottom: 2px; }
+  .cc-action-info span { font-size: 12px; color: #8a3030; }
+  .cc-action-tag { background: #d23c3c; color: #fff; font-size: 11px; font-weight: 700; text-transform: uppercase; padding: 6px 12px; border-radius: 12px; white-space: nowrap; }
+
+  .cc-summary { display: grid; grid-template-columns: repeat(5, minmax(120px, 1fr)); gap: 14px; margin-bottom: 20px; }
+  .cc-sum-card { background: #fff; border: 1px solid #e2e5ea; border-radius: 8px; padding: 16px; }
+  .cc-sum-selected { border: 2px solid #2f6fed; }
+  .cc-sum-num { font-size: 30px; font-weight: 700; line-height: 1; color: #1d2126; }
+  .cc-num-green { color: #1f9d55; }
+  .cc-num-red { color: #d23c3c; }
+  .cc-num-gray { color: #9aa2ad; }
+  .cc-sum-label { font-size: 11px; text-transform: uppercase; letter-spacing: .04em; color: #8a93a1; margin-top: 6px; }
+
+  .cc-rangebar { font-size: 13px; color: #4b5462; margin-bottom: 14px; }
+  .cc-rangebar input { width: 55px; margin: 0 4px; padding: 4px 6px; border: 1px solid #d7dbe2; border-radius: 4px; }
+
+  .cc-subheading { font-size: 16px; margin: 28px 0 10px; font-weight: 700; }
+
+  table.cc-table { width: 100%; border-collapse: collapse; background: #fff; border: 1px solid #e2e5ea; border-radius: 8px; overflow: hidden; font-size: 13px; }
+  table.cc-table thead th { text-align: left; font-size: 11px; text-transform: uppercase; letter-spacing: .04em; color: #8a93a1; padding: 12px 16px; border-bottom: 1px solid #e2e5ea; background: #fafbfc; }
+  table.cc-table tbody td { padding: 12px 16px; border-bottom: 1px solid #eef0f3; }
+  table.cc-table tbody tr:last-child td { border-bottom: none; }
+  table.cc-table tbody tr:hover { background: #fafbfc; }
+
+  .cc-pill { display: inline-block; padding: 4px 12px; border-radius: 14px; font-size: 11px; font-weight: 700; text-transform: uppercase; color: #fff; }
+  .cc-pill-safe { background: #1f9d55; }
+  .cc-pill-alert { background: #d23c3c; }
+  .cc-pill-unknown { background: #9aa2ad; }
+
+  .cc-badge { display: inline-block; min-width: 22px; text-align: center; padding: 2px 8px; border-radius: 10px; font-size: 12px; font-weight: 700; background: #fde8e8; color: #d23c3c; }
+  .cc-badge-zero { background: #f1f2f4; color: #9aa2ad; }
+
+  .cc-source { font-size: 12px; color: #8a93a1; }
+  .cc-empty { padding: 24px; text-align: center; color: #9aa2ad; font-size: 13px; }
 </style>
 </head>
 <body>
 <div id="root">
-  <div class="cc-header">
-    <h1>ColdChain Rx Monitor</h1>
-    <div class="cc-range">
-      Safe range (deg C): <input id="ccMin" type="number" value="2" step="0.5"> to <input id="ccMax" type="number" value="8" step="0.5">
+  <div class="cc-topbar">
+    <div class="cc-title">
+      <h1>ColdChain</h1>
+      <div class="cc-updated">Updated <span id="ccUpdated">--</span></div>
+    </div>
+    <div class="cc-controls">
+      <input id="ccSearch" type="text" placeholder="Search vehicle...">
+      <button id="ccRefresh">Refresh</button>
     </div>
   </div>
+
   <div id="ccBanner" class="cc-banner" style="display:none;"></div>
-  <div id="ccGrid" class="cc-grid"></div>
-  <h2>Excursion log</h2>
-  <table id="ccLog">
-    <thead><tr><th>Time</th><th>Vehicle</th><th>Temp (deg C)</th><th>Safe range</th></tr></thead>
+
+  <div id="ccActionPanel" class="cc-action-panel" style="display:none;">
+    <div class="cc-action-title">Action needed, pharma cargo at risk</div>
+    <div id="ccActionList"></div>
+  </div>
+
+  <div class="cc-summary">
+    <div class="cc-sum-card cc-sum-selected">
+      <div class="cc-sum-num" id="sumTotal">0</div>
+      <div class="cc-sum-label">Total</div>
+    </div>
+    <div class="cc-sum-card">
+      <div class="cc-sum-num cc-num-green" id="sumSafe">0</div>
+      <div class="cc-sum-label">Safe</div>
+    </div>
+    <div class="cc-sum-card">
+      <div class="cc-sum-num cc-num-red" id="sumAlert">0</div>
+      <div class="cc-sum-label">Out of range</div>
+    </div>
+    <div class="cc-sum-card">
+      <div class="cc-sum-num cc-num-gray" id="sumUnknown">0</div>
+      <div class="cc-sum-label">No data</div>
+    </div>
+    <div class="cc-sum-card">
+      <div class="cc-sum-num cc-num-red" id="sumExcursions">0</div>
+      <div class="cc-sum-label">Excursions today</div>
+    </div>
+  </div>
+
+  <div class="cc-rangebar">
+    Safe range (deg C): <input id="ccMin" type="number" value="2" step="0.5"> to <input id="ccMax" type="number" value="8" step="0.5">
+  </div>
+
+  <table class="cc-table" id="ccTable">
+    <thead>
+      <tr><th>Vehicle</th><th>Status</th><th>Temp</th><th>Last reading</th><th>Source</th><th>Excursions today</th></tr>
+    </thead>
+    <tbody id="ccTableBody"></tbody>
+  </table>
+
+  <h2 class="cc-subheading">Excursion log</h2>
+  <table class="cc-table" id="ccLog">
+    <thead><tr><th>Time</th><th>Vehicle</th><th>Temp</th><th>Safe range</th></tr></thead>
     <tbody></tbody>
   </table>
 </div>
@@ -53,10 +129,26 @@
       maxSafe: 8,
       devices: {},
       pollTimer: null,
-      maxDevices: 20
+      maxDevices: 20,
+      searchTerm: '',
+      apiRef: null
     };
 
     function fmt(n) { return Math.round(n * 10) / 10; }
+
+    function relTime(date) {
+      if (!date) { return '-'; }
+      var diffMin = Math.round((Date.now() - date.getTime()) / 60000);
+      if (diffMin < 1) { return 'just now'; }
+      if (diffMin < 60) { return diffMin + ' min ago'; }
+      return Math.round(diffMin / 60) + ' hr ago';
+    }
+
+    function excursionReason(temp) {
+      if (temp > cc.maxSafe) { return 'Running ' + fmt(temp - cc.maxSafe) + ' deg C too warm'; }
+      if (temp < cc.minSafe) { return 'Running ' + fmt(cc.minSafe - temp) + ' deg C too cold'; }
+      return '';
+    }
 
     function nextSimTemp(prevTemp) {
       var base = (prevTemp === undefined) ? (cc.minSafe + cc.maxSafe) / 2 : prevTemp;
@@ -65,51 +157,86 @@
       return fmt(base + drift + excursion);
     }
 
-    function sparkline(history) {
-      if (history.length < 2) { return ''; }
-      var temps = history.map(function (h) { return h.temp; });
-      var min = Math.min.apply(null, temps);
-      var max = Math.max.apply(null, temps);
-      var range = (max - min) || 1;
-      var w = 130, h = 28;
-      var pts = temps.map(function (t, i) {
-        var x = (i / (temps.length - 1)) * w;
-        var y = h - ((t - min) / range) * h;
-        return x.toFixed(1) + ',' + y.toFixed(1);
-      }).join(' ');
-      return '<svg width="' + w + '" height="' + h + '"><polyline points="' + pts + '" fill="none" stroke="currentColor" stroke-width="2"/></svg>';
-    }
-
     function logExcursion(deviceName, temp) {
       var tbody = document.querySelector('#ccLog tbody');
       var row = document.createElement('tr');
       row.innerHTML =
         '<td>' + new Date().toLocaleString() + '</td>' +
         '<td>' + deviceName + '</td>' +
-        '<td>' + temp + '</td>' +
+        '<td>' + temp + ' deg C</td>' +
         '<td>' + cc.minSafe + ' to ' + cc.maxSafe + '</td>';
       tbody.insertBefore(row, tbody.firstChild);
     }
 
-    function renderGrid() {
-      var grid = document.getElementById('ccGrid');
-      if (!grid) { return; }
-      grid.innerHTML = '';
-      Object.keys(cc.devices).forEach(function (id) {
+    function pill(status) {
+      if (status === 'safe') { return '<span class="cc-pill cc-pill-safe">Safe</span>'; }
+      if (status === 'alert') { return '<span class="cc-pill cc-pill-alert">Out of range</span>'; }
+      return '<span class="cc-pill cc-pill-unknown">No data</span>';
+    }
+
+    function badge(count) {
+      return '<span class="cc-badge' + (count ? '' : ' cc-badge-zero') + '">' + count + '</span>';
+    }
+
+    function renderAll() {
+      var ids = Object.keys(cc.devices).filter(function (id) {
+        return cc.devices[id].name.toLowerCase().indexOf(cc.searchTerm) !== -1;
+      });
+
+      var totals = { safe: 0, alert: 0, unknown: 0, excursions: 0 };
+      var tbody = document.getElementById('ccTableBody');
+      tbody.innerHTML = '';
+
+      var actionItems = [];
+
+      if (!ids.length) {
+        tbody.innerHTML = '<tr><td colspan="6" class="cc-empty">No vehicles match.</td></tr>';
+      }
+
+      ids.forEach(function (id) {
         var d = cc.devices[id];
         var last = d.history.length ? d.history[d.history.length - 1] : null;
         var temp = last ? last.temp : null;
-        var safe = temp !== null && temp >= cc.minSafe && temp <= cc.maxSafe;
-        var card = document.createElement('div');
-        card.className = 'cc-card ' + (temp === null ? 'cc-unknown' : (safe ? 'cc-safe' : 'cc-alert'));
-        card.innerHTML =
-          '<div class="cc-card-name">' + d.name + '</div>' +
-          '<div class="cc-card-temp">' + (temp === null ? '...' : temp + ' deg C') + '</div>' +
-          '<div class="cc-card-status">' + (temp === null ? 'No data yet' : (safe ? 'Safe' : 'Out of range')) + '</div>' +
-          sparkline(d.history) +
-          '<div class="cc-card-source">' + (d.simulated ? 'Simulated reading' : 'Live sensor') + '</div>';
-        grid.appendChild(card);
+        var status = 'unknown';
+        if (temp !== null) { status = (temp >= cc.minSafe && temp <= cc.maxSafe) ? 'safe' : 'alert'; }
+        totals[status === 'unknown' ? 'unknown' : status]++;
+        totals.excursions += d.excursionCount;
+
+        if (status === 'alert') {
+          actionItems.push(
+            '<div class="cc-action-item">' +
+              '<div class="cc-action-info"><strong>' + d.name + '</strong>' +
+              '<span>' + temp + ' deg C, ' + excursionReason(temp) + '</span></div>' +
+              '<div class="cc-action-tag">Needs different vehicle</div>' +
+            '</div>'
+          );
+        }
+
+        var row = document.createElement('tr');
+        row.innerHTML =
+          '<td>' + d.name + '</td>' +
+          '<td>' + pill(status) + '</td>' +
+          '<td>' + (temp === null ? '-' : temp + ' deg C') + '</td>' +
+          '<td>' + relTime(last ? last.t : null) + '</td>' +
+          '<td class="cc-source">' + (last ? (d.simulated ? 'Simulated reading' : 'Live sensor') : '-') + '</td>' +
+          '<td>' + badge(d.excursionCount) + '</td>';
+        tbody.appendChild(row);
       });
+
+      var actionPanel = document.getElementById('ccActionPanel');
+      if (actionItems.length) {
+        document.getElementById('ccActionList').innerHTML = actionItems.join('');
+        actionPanel.style.display = 'block';
+      } else {
+        actionPanel.style.display = 'none';
+      }
+
+      document.getElementById('sumTotal').textContent = Object.keys(cc.devices).length;
+      document.getElementById('sumSafe').textContent = totals.safe;
+      document.getElementById('sumAlert').textContent = totals.alert;
+      document.getElementById('sumUnknown').textContent = totals.unknown;
+      document.getElementById('sumExcursions').textContent = totals.excursions;
+      document.getElementById('ccUpdated').textContent = new Date().toLocaleTimeString();
     }
 
     function findTemperatureDiagnostics(api, deviceIds, onDone) {
@@ -153,9 +280,9 @@
             d.simulated = true;
             d.history.push({ t: new Date(), temp: temp });
             if (d.history.length > 40) { d.history.shift(); }
-            if (temp < cc.minSafe || temp > cc.maxSafe) { logExcursion(d.name, temp); }
+            if (temp < cc.minSafe || temp > cc.maxSafe) { d.excursionCount++; logExcursion(d.name, temp); }
           });
-          renderGrid();
+          renderAll();
           return;
         }
 
@@ -181,23 +308,25 @@
               d.history.push({ t: new Date(), temp: temp });
             }
             if (d.history.length > 40) { d.history.shift(); }
-            if (temp < cc.minSafe || temp > cc.maxSafe) { logExcursion(d.name, temp); }
+            if (temp < cc.minSafe || temp > cc.maxSafe) { d.excursionCount++; logExcursion(d.name, temp); }
           });
-          renderGrid();
-        }, function () { renderGrid(); });
+          renderAll();
+        }, function () { renderAll(); });
       });
     }
 
     return {
       initialize: function (api, pageState, callback) {
-        var minInput = document.getElementById('ccMin');
-        var maxInput = document.getElementById('ccMax');
-        minInput.addEventListener('change', function (e) { cc.minSafe = parseFloat(e.target.value); });
-        maxInput.addEventListener('change', function (e) { cc.maxSafe = parseFloat(e.target.value); });
+        cc.apiRef = api;
+
+        document.getElementById('ccMin').addEventListener('change', function (e) { cc.minSafe = parseFloat(e.target.value); renderAll(); });
+        document.getElementById('ccMax').addEventListener('change', function (e) { cc.maxSafe = parseFloat(e.target.value); renderAll(); });
+        document.getElementById('ccSearch').addEventListener('input', function (e) { cc.searchTerm = e.target.value.toLowerCase(); renderAll(); });
+        document.getElementById('ccRefresh').addEventListener('click', function () { poll(cc.apiRef); });
 
         api.call('Get', { typeName: 'Device', search: { fromDate: new Date().toISOString() } }, function (devices) {
           (devices || []).slice(0, cc.maxDevices).forEach(function (d) {
-            cc.devices[d.id] = { name: d.name, history: [], simulated: true };
+            cc.devices[d.id] = { name: d.name, history: [], simulated: true, excursionCount: 0 };
           });
           var banner = document.getElementById('ccBanner');
           banner.style.display = 'block';
@@ -206,11 +335,11 @@
           cc.pollTimer = setInterval(function () { poll(api); }, 30000);
           callback();
         }, function (err) {
-          console.error('ColdChain Rx: failed to load devices', err);
+          console.error('ColdChain: failed to load devices', err);
           callback();
         });
       },
-      focus: function () { renderGrid(); },
+      focus: function () { renderAll(); },
       blur: function () { if (cc.pollTimer) { clearInterval(cc.pollTimer); cc.pollTimer = null; } }
     };
   };
